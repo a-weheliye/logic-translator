@@ -1,13 +1,22 @@
+""" 
+#-------------------------------------------------------------------------------
+# EBNF GRAMMAR
+#-------------------------------------------------------------------------------
+        
+ formula(f) ::= "∃" var "." "(" formula() ")"  « f := Existential(var, operand) »
+              | "∀" var "." "(" formula() ")"  « f := Universal(var, operand) »
+              | complex(c)
+ complex(c) ::= term_or(t)  { "⇒" complex(c) « t := Implies(IMPLIES, t, c) » }
+ term_or(o) ::= term_and(t) { "∨" term_or(o) « t := Disjunction(LOR, t, o) » }
+term_and(a) ::= factor(t)   { "∧" term_and(a) « t := Conjunction(LAND, t, a) » }
+  factor(f) ::= atom(f)
+              | '(' complex(c) ')'
+              | "¬" complex(c)  « f := Negation(NOT, c) » 
+   atom ::= A | B | ... | Z
+    var ::= a | b | ... | z
+
 """
 
-formula ::= ("∀" | "∃") var "." "(" formula ")" | complex
-complex ::= term { "⇒" complex }
-   term ::= factor { ("∧" | "∨") factor}
- factor ::= atom | '(' complex ')' | "¬" complex
-   atom ::= P | Q | R | S | T
-    var ::= a | b | ... | z
-    
-"""
 import string
 
 import regex as re
@@ -87,16 +96,6 @@ def proper_capitalization(s):
 
 
 # ------------------------------------------------------------------------------------------------
-
-class Variable:
-    def __init__(self, name, pos):
-        self.name, self.pos = name, scanner.pos
-        
-    def __str__(self) : return str(self.name)    
-    def __repr__(self): return str(self.name)
-    def __iter__(self): return iter(self.name)
-    
-
 class AtomicProp:
     def __init__(self, prop, pos):
         self.prop = prop
@@ -190,7 +189,8 @@ class Universal:
     def __repr__(self): return f"Universal({repr(self.variable)}, {repr(self.operand)})"
     
 # ------------------------------------------------------------------------------------------------
-
+# PARSING PROCEEDURES
+# ------------------------------------------------------------------------------------------------
 # formula(f) ::= ("∀" | "∃") var "." "(" formula() ")" | complex(c)
 def formula():
     if scanner.sym in (FORALL, EXIST):
@@ -220,7 +220,6 @@ def complex():
     return t
     
     
-       
 # term_or(o) ::= term_and(t) { "∨" term_or(a) « t := Disjunction(LOR, t, o) » }
 def term_or():
     t = term_and()
@@ -245,7 +244,7 @@ def term_and():
 
 
 # factor(f) ::= atom(f) 
-#             | '(' complex(c) ')' «  »
+#             | '(' complex(c) ')' 
 #             | "¬" complex(c)     « Negation(NOT, c) »
 def factor():
     if scanner.sym == VAR and scanner.val in string.ascii_uppercase:
@@ -284,12 +283,10 @@ def factor():
 
     else: error("term expected", scanner.pos)
     return f
-
+# ------------------------------------------------------------------------------------------------
 
 
 def ast(s):
-    # global SC.src, SC.pos
-    # global depth = 0
     scanner.src, scanner.pos = s, 0
     scanner.getChar()
     getSym()
