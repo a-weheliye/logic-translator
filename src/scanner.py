@@ -1,4 +1,7 @@
-
+""" 
+scanner.py is modified version of SC.py originally written 
+by Dr. Emil Sekerinski (McMaster University) for CS 4TB3
+"""
 
 global src, pos, ch, sym, val
 
@@ -69,7 +72,6 @@ def getSym():
     elif ch == '(': getChar(); sym = LPAREN
     elif ch == ')': getChar(); sym = RPAREN
     elif ch == ',': getChar(); sym = COMMA
-#=============================================== PROJECT ADDITION
     elif ch == '⇒' : getChar(); sym = IMPLIES
     elif ch == '¬' : getChar(); sym = LNOT
     elif ch == '∧' : getChar(); sym = LAND
@@ -77,6 +79,5 @@ def getSym():
     elif ch == '∀' : getChar(); sym = FORALL
     elif ch == '∃' : getChar(); sym = EXIST
     elif ch == '.' : getChar(); sym = DOT
-#=============================================== PROJECT ADDITION
     elif ch == chr(0): sym = EOF
     else: error('unexpected character')
